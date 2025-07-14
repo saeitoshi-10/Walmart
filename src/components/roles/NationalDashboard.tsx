@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ViewType } from '../../App';
-import { TrendingUp, TrendingDown, Globe, Users, DollarSign, AlertTriangle, CheckCircle, Clock, MapPin, Brain, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Globe, DollarSign, AlertTriangle, CheckCircle, Clock, MapPin, Brain, BarChart3, X } from 'lucide-react';
 
 interface NationalDashboardProps {
   currentView: ViewType;
@@ -8,6 +8,19 @@ interface NationalDashboardProps {
 }
 
 export const NationalDashboard: React.FC<NationalDashboardProps> = ({ currentView, onNavigate }) => {
+  // Orchestration state and data for AI Orchestration view
+  const [selectedOrchestration, setSelectedOrchestration] = useState<number | null>(null);
+  const orchestrations = [
+    { title: 'Summer Product Surge', regions: 8, stores: 1247, status: 'Pending' },
+    { title: 'Hurricane Prep - Southeast', regions: 3, stores: 456, status: 'Active' },
+    { title: 'Back-to-School Rollout', regions: 12, stores: 2891, status: 'Completed' },
+  ];
+  const orchestrationDetails = [
+    { id: 'ORCH-001', name: 'Sample Orchestration 1', description: 'This pipeline handles product surge scenarios.', status: 'Pending', createdDate: '2025-07-01', owner: 'Team 1', region: 'Region 1' },
+    { id: 'ORCH-002', name: 'Sample Orchestration 2', description: 'This pipeline handles hurricane preparation.', status: 'Active', createdDate: '2025-07-02', owner: 'Team 2', region: 'Region 2' },
+    { id: 'ORCH-003', name: 'Sample Orchestration 3', description: 'This pipeline handles back-to-school rollout.', status: 'Completed', createdDate: '2025-07-03', owner: 'Team 3', region: 'Region 3' },
+  ];
+  
   if (currentView === 'analytics') {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -157,51 +170,87 @@ export const NationalDashboard: React.FC<NationalDashboardProps> = ({ currentVie
           <p className="text-gray-600">Enterprise-wide supply chain automation and coordination</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Orchestrations</h3>
-            <div className="space-y-4">
-              {[
-                { title: 'Summer Product Surge', regions: 8, stores: 1247, status: 'active' },
-                { title: 'Hurricane Prep - Southeast', regions: 3, stores: 456, status: 'pending' },
-                { title: 'Back-to-School Rollout', regions: 12, stores: 2891, status: 'scheduled' },
-              ].map((orchestration, index) => (
-                <div key={index} className="border rounded-lg p-4">
+        <div className="mb-8 overflow-hidden">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Orchestrations</h3>
+          {selectedOrchestration === null ? (
+            <div className="space-y-8">
+              {orchestrations.map((orchestration, index) => (
+                <div key={index} className="border rounded-lg p-4 bg-white">
                   <div className="flex items-center justify-between mb-2">
                     <div className="font-medium text-gray-900">{orchestration.title}</div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      orchestration.status === 'active' ? 'bg-green-100 text-green-700' :
-                      orchestration.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                      orchestration.status === 'Active' ? 'bg-green-100 text-green-700' :
+                      orchestration.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-blue-100 text-blue-700'
-                    }`}>
-                      {orchestration.status}
-                    </span>
+                    }`}>{orchestration.status}</span>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {orchestration.regions} regions • {orchestration.stores} stores
+                  <div className="text-sm text-gray-600">{orchestration.regions} regions • {orchestration.stores} stores</div>
+                  <div className="flex justify-end mt-4">
+                    <button onClick={() => setSelectedOrchestration(index)} className="text-blue-600 font-medium">Detail</button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">System Performance</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                <span className="font-medium">AI Accuracy</span>
-                <span className="text-green-600 font-bold">98.7%</span>
+          ) : (
+            <div className="flex space-x-4">
+              {/* Left pane: selected card */}
+              <div className="w-3/5 border rounded-lg p-4 bg-white transition-all duration-300">
+                {(() => {
+                  const orchestration = orchestrations[selectedOrchestration];
+                  return (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-medium text-gray-900">{orchestration.title}</div>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          orchestration.status === 'Active' ? 'bg-green-100 text-green-700' :
+                          orchestration.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>{orchestration.status}</span>
+                      </div>
+                      <div className="text-sm text-gray-600">{orchestration.regions} regions • {orchestration.stores} stores</div>
+                    </>
+                  );
+                })()}
               </div>
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                <span className="font-medium">Response Time</span>
-                <span className="text-blue-600 font-bold">1.2 hrs</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                <span className="font-medium">Cost Savings</span>
-                <span className="text-purple-600 font-bold">$12.4M</span>
+              {/* Right pane: detail panel */}
+              <div className="w-2/5 bg-white shadow-lg rounded-lg p-6 z-20 transition-all duration-300 relative">
+                <button onClick={() => setSelectedOrchestration(null)} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 z-30">
+                  <X size={16} />
+                </button>
+                <div className="space-y-2">
+                  {(() => {
+                    const details = orchestrationDetails[selectedOrchestration];
+                    return (
+                      <>
+                        <div><span className="font-medium">ID:</span> {details.id}</div>
+                        <div><span className="font-medium">Name:</span> {details.name}</div>
+                        <div><span className="font-medium">Description:</span> {details.description}</div>
+                        <div><span className="font-medium">Status:</span> {details.status}</div>
+                        <div><span className="font-medium">Created Date:</span> {details.createdDate}</div>
+                        <div><span className="font-medium">Owner:</span> {details.owner}</div>
+                        <div><span className="font-medium">Region:</span> {details.region}</div>
+                      </>
+                    );
+                  })()}
+                </div>
+                {/* Action buttons */}
+                <div className="mt-6 flex flex-col md:flex-row gap-2">
+                  <button
+                    onClick={() => console.log(`Approved ${orchestrationDetails[selectedOrchestration].id}`)}
+                    className="flex-1 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => console.log(`Disapproved ${orchestrationDetails[selectedOrchestration].id}`)}
+                    className="flex-1 w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                  >
+                    Disapprove
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
